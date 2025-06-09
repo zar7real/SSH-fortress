@@ -1,0 +1,72 @@
+# /etc/ssh/sshd_config - Configurazione SSH Ultra-Sicura
+# Backup del file originale: cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+
+# ================== CONFIGURAZIONE BASE ==================
+Port 2222                          # Cambia porta standard (usa una porta > 1024)
+Protocol 2                         # Solo SSH-2
+AddressFamily inet                 # Solo IPv4 (commenta se usi IPv6)
+
+# ================== AUTENTICAZIONE E ACCESSO ==================
+PermitRootLogin no                 # Blocca accesso root
+MaxAuthTries 3                     # Max 3 tentativi di login
+LoginGraceTime 30                  # 30 secondi per completare login
+MaxStartups 2:30:10               # Limita connessioni concorrenti
+MaxSessions 2                      # Max 2 sessioni per connessione
+
+# Lista utenti autorizzati (sostituisci 'tuousername' con il tuo username)
+AllowUsers tuousername
+# AllowGroups ssh-users            # Alternativa: crea gruppo ssh-users
+
+# ================== AUTENTICAZIONE A CHIAVE ==================
+PubkeyAuthentication yes           # Abilita autenticazione a chiave pubblica
+AuthorizedKeysFile .ssh/authorized_keys
+PasswordAuthentication no          # DISABILITA password (solo dopo aver configurato le chiavi!)
+PermitEmptyPasswords no           # No password vuote
+ChallengeResponseAuthentication no # No challenge/response
+
+# ================== CRITTOGRAFIA AVANZATA ==================
+# Algoritmi di Key Exchange sicuri
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+
+# Cifrari simmetrici sicuri
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+
+# Algoritmi MAC sicuri
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+
+# Algoritmi di firma host key
+HostKeyAlgorithms ssh-rsa,rsa-sha2-512,rsa-sha2-256,ecdsa-sha2-nistp256,ssh-ed25519
+
+# ================== SICUREZZA AGGIUNTIVA ==================
+ClientAliveInterval 300           # Ping client ogni 5 minuti
+ClientAliveCountMax 2             # Disconnetti dopo 2 ping falliti
+TCPKeepAlive no                   # Non usare TCP keepalive
+Compression no                    # Disabilita compressione (vulnerabilità)
+
+# ================== RESTRIZIONI DI RETE ==================
+# Limita IP sorgente (decommentare e personalizzare)
+# AllowUsers tuousername@192.168.1.0/24
+# DenyUsers *@*
+
+# ================== LOGGING E MONITORAGGIO ==================
+SyslogFacility AUTHPRIV          # Log su authpriv
+LogLevel VERBOSE                 # Log dettagliato per monitoraggio
+
+# ================== FUNZIONALITÀ DISABILITATE ==================
+X11Forwarding no                 # No X11 forwarding
+AllowTcpForwarding no           # No port forwarding
+GatewayPorts no                 # No gateway ports
+PermitTunnel no                 # No tunnel
+AllowAgentForwarding no         # No SSH agent forwarding
+PermitUserEnvironment no        # No variabili ambiente custom
+PrintMotd no                    # No message of the day
+PrintLastLog yes               # Mostra ultimo login
+
+# ================== BANNER DI SICUREZZA ==================
+Banner /etc/ssh/ssh_banner      # Banner di avviso (crea il file)
+
+# ================== HOST KEYS ==================
+# Usa solo chiavi sicure
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+# Rimuovi DSA e ECDSA se presenti
